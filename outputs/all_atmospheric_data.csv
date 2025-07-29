@@ -1,0 +1,21 @@
+Report,Location,Relative Humidity,Air Temp,Dew Point,Specific Humidity
+Cornerstone sample DS report,Exterior,94.0,3.3,2.4,4.7
+Cornerstone sample DS report,Ground floor,49.0,21.9,10.7,7.8
+Cornerstone sample DS report,First floor,54.0,24.1,14.2,9.7
+David_Bly_BN17,Exterior,75.0,19.6,15.0,10.4
+David_Bly_BN17,Hallway,70.5,24.1,18.4,12.7
+David_Bly_BN17,Kitchen,61.5,24.8,16.9,11.5
+David_Bly_BN43,Exterior,92.4,12.2,11.0,8.1
+David_Bly_BN43,Kitchen,62.1,20.9,13.4,9.5
+David_Bly_BN43,Lounge,69.6,18.8,13.3,9.4
+David_Bly_BN43,Bathroom,66.4,18.7,12.6,9.0
+David_Bly_BN43,Bed 1,64.7,20.4,13.6,9.6
+David_Bly_BN43,Bed 2,74.2,19.3,14.6,10.3
+David_Bly_BR1,Exterior,80.4,12.5,9.22,7.3
+David_Bly_BR1,Hallway,61.1,23.6,15.6,10.7
+David_Bly_BR1,Kitchen/Lounge,61.4,23.7,15.8,10.8
+David_Bly_BR1,Bedroom 2,54.6,23.7,14.0,9.6
+Full report sample,Exterior,86.5,8.2,6.05,6.0
+Full report sample,Hallway,67.0,19.1,12.8,9.0
+Full report sample,Bedroom 2,59.3,19.0,10.8,7.9
+Full report sample,Kitchen,57.9,19.5,10.9,8.0
