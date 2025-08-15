@@ -20,7 +20,9 @@ def clean_raw_text(raw_text: str) -> str:
         "© Cornerstone Management Services Ltd 2009.",
         "Reg Office: 24 Picton House Hussar Court Westside View Waterlooville Hants PO7 7SQ",
         "Tel: 0344 846 0955 E: enquiries@cornerstone-ltd.co.uk W: www.cornerstone-ltd.co.uk",
-        "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd."
+        "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd.",
+        "21A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire PO7 7SQ",
+        "20A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire, PO7 7SQ"
     ]
 
     text_lines = raw_text.splitlines()
@@ -68,7 +70,9 @@ def extract_full_text(pdf_path: str) -> str:
         "© Cornerstone Management Services Ltd 2009.",
         "Reg Office: 24 Picton House Hussar Court Westside View Waterlooville Hants PO7 7SQ",
         "Tel: 0344 846 0955 E: enquiries@cornerstone-ltd.co.uk W: www.cornerstone-ltd.co.uk",
-        "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd."
+        "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd.",
+        "21A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire PO7 7SQ",
+        "20A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire, PO7 7SQ"
     ]
 
     text_lines = full_text.splitlines()
@@ -111,7 +115,8 @@ def extract_conclusion_section(pdf_path: str) -> str | None:
         "© Cornerstone Management Services Ltd 2009.",
         "Reg Office: 24  Picton House Hussar Court Westside View Waterlooville  Hants PO 7 7SQ",
         "Tel: 0 344 846 0955    E: enquiries@cornerstone -ltd.co.uk    W: www.cornerstone -ltd.co.uk",
-        "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd."
+        "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd.",
+        "20A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire, PO7 7SQ"
         ]
 
         # Remove any lines that exactly match known footer lines
@@ -132,9 +137,12 @@ def extract_atmospheric_conditions(pdf_path: str) -> str:
     FOOTER_LINES = [
         "Cornerstone Technical Report",
         "© Cornerstone Management Services Ltd 2009.",
+        "21A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire PO7 7SQ",
         "Reg Office: 24 Picton House Hussar Court Westside View Waterlooville Hants PO7 7SQ",
         "Tel: 0344 846 0955 E: enquiries@cornerstone-ltd.co.uk W: www.cornerstone-ltd.co.uk",
-        "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd."
+        "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd.",
+        "20A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire, PO7 7SQ"
+        "21A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire PO7 7SQ"
     ]
 
     text_lines = raw_text.splitlines()
@@ -155,6 +163,7 @@ def extract_atmospheric_conditions(pdf_path: str) -> str:
     return cleaned_text[match.start():].strip()
 
 import re
+import unicodedata
 
 def extract_atmospheric_table(pdf_path: str) -> str:
     """
@@ -172,8 +181,10 @@ def extract_atmospheric_table(pdf_path: str) -> str:
         "Cornerstone Technical Report",
         "© Cornerstone Management Services Ltd 2009.",
         "Reg Office: 24 Picton House Hussar Court Westside View Waterlooville Hants PO7 7SQ",
+        "20A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire, PO7 7SQ",
         "Tel: 0344 846 0955 E: enquiries@cornerstone-ltd.co.uk W: www.cornerstone-ltd.co.uk",
-        "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd."
+        "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd.",
+        "21A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire PO7 7SQ"
     ]
 
     # Remove footer lines
@@ -188,7 +199,7 @@ def extract_atmospheric_table(pdf_path: str) -> str:
         stripped = line.strip()
 
         # Detect the table header line
-        if not capture and re.search(r"Location\s+Relative Humidity.*Specific Humidity", stripped):
+        if not capture and re.search(r"Location.*Relative Humidity.*Specific Humidity", stripped):
             capture = True
             continue  # skip the header line
 
@@ -200,6 +211,62 @@ def extract_atmospheric_table(pdf_path: str) -> str:
             if is_section_heading(stripped) or is_paragraph(stripped) or stripped == "":
                 break  # Stop at next section or blank or paragraph
 
-            table_lines.append(line)
+            # Remove units like %, g/Kg, °C from the line
+            cleaned_line = re.sub(r"\s*%|\s*g/kg|\s*°C", "", line, flags=re.IGNORECASE)
+
+
+            # 1) Normalize weird unicode minus/spacing
+            cleaned_line = unicodedata.normalize("NFKC", cleaned_line)
+
+            # turn " - 1.3" / "– 1.3" / "— 1.3" (start of line) into "-1.3"
+            cleaned_line = re.sub(r'^[\-–—]\s+(?=\d)', '-', cleaned_line)
+
+            # turn " …  -  1.3" in the middle of a line into " -1.3"
+            cleaned_line = re.sub(r'(?<=\s)[\-–—]\s+(?=\d)', '-', cleaned_line)
+
+            # 2) Convert European decimal commas to dots: "22,4" -> "22.4"
+            cleaned_line = re.sub(r'(\d),(\d)', r'\1.\2', cleaned_line)
+
+            # 3) Collapse multiple spaces
+            cleaned_line = re.sub(r'\s{2,}', ' ', cleaned_line).strip()
+
+            table_lines.append(cleaned_line)
+
 
     return "\n".join(table_lines).strip()
+
+
+import re
+
+def extract_relevant(pdf_path: str) -> str | None:
+    """
+    Extracts all text from section 1.0 Property through 3.0 Conclusion (inclusive),
+    and stops at the next section (e.g. 3.1, 4.0).
+    """
+    full_text = extract_full_text(pdf_path)
+    lines = full_text.splitlines()
+
+    def is_section_heading(line):
+        return re.match(r"^\d+\.\d+(\s+\w+|:)", line.strip())
+
+    capture = False
+    relevant_lines = []
+
+    for line in lines:
+        stripped = line.strip()
+
+        if stripped.startswith("1.0 Property:"):
+            capture = True
+
+        if capture:
+            if is_section_heading(stripped):
+                # Extract the section number (e.g., "3.1" from "3.1 Recommendations:")
+                section_match = re.match(r"^(\d+)\.(\d+)", stripped)
+                if section_match:
+                    major, minor = int(section_match.group(1)), int(section_match.group(2))
+                    if major > 3 or (major == 3 and minor > 0):
+                        break  # stop after 3.0
+
+            relevant_lines.append(line)
+
+    return "\n".join(relevant_lines).strip() if relevant_lines else None

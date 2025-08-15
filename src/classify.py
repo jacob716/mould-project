@@ -34,7 +34,7 @@ def classify_issue(conclusion_text: str, model: str = "mistral") -> str:
     return output
 
 
-def identify_features(full_text: str, model: str = "mistral") -> str:
+
     prompt = f"""
 Extract the following fields from the property inspection report below. Your response **must be valid JSON** with exactly these fields.
 If a value is not mentioned in the report, return "not mentioned" for that field.
@@ -77,6 +77,85 @@ Format your response **exactly** like this:
 ### END_JSON
 
 Do **not** include explanations, markdown, or commentary — only return the JSON block.
+
+Report:
+\"\"\"
+{full_text}
+\"\"\"
+    """
+
+    result = subprocess.run(
+        ["ollama", "run", model],
+        input=prompt.encode(),
+        capture_output=True,
+    )
+    output = result.stdout.decode().strip()
+    return output
+
+def identify_features(full_text: str, model: str = "mistral") -> str:
+    prompt = f"""
+Extract the following fields from the property inspection report below. Your response **must be valid JSON** with exactly these fields.
+If a value is not mentioned in the report, return "not mentioned" for that field.
+
+Instructions per field:
+
+- **property_type**: A short description of the type of property (e.g. "semi-detached 2-bedroom maisonette")
+- **wall_type**: Wall construction type (e.g. cavity wall, solid wall, timber frame)
+- **age**: Construction age of the building if stated (e.g. 1950s, early 2000s)
+- **issue_type**: Classify the issue as "mould", "damp", "both", or "not mentioned"
+- **orientation**: The compass direction (north, east, south, west) of any wall or room affected by mould or damp
+- **ventilation**: Description of ventilation present (e.g. extractors, trickle vents, passive vents)
+- **window_type**: Type of windows in the property (e.g. uPVC, single-glazed, double-glazed)
+- **occupancy**: A description of the people and pets living in the property (e.g. "2 adults and 1 dog")
+- **drying_clothes**: Whether clothes are dried indoors
+- **where_else_is_mould**: Other locations in the property where mould was found or mentioned
+
+
+Format your response **exactly** like this:
+
+### START_JSON
+{{
+  "property_type": "...",
+  "wall_type": "...",
+  "age": "...",
+  "orientation": "...",
+  "ventilation": "...",
+  "window_type": "...",
+  "occupancy": "...",
+  "drying_clothes": "...",
+  "where_else_is_mould": "...",
+  "issue_type": "..."
+}}
+### END_JSON
+
+Do **not** include explanations, markdown, or commentary — only return the JSON block.
+
+Report:
+\"\"\"
+{full_text}
+\"\"\"
+    """
+
+    result = subprocess.run(
+        ["ollama", "run", model],
+        input=prompt.encode(),
+        capture_output=True,
+    )
+    output = result.stdout.decode().strip()
+    return output
+
+import subprocess
+
+def classify_property_type(full_text: str, model: str = "mistral") -> str:
+    prompt = f"""
+Extract the **property type** from the property inspection report below. Respond with a short description such as:
+- "semi-detached 2-bedroom maisonette"
+- "mid-terrace Victorian house"
+- "1960s ground-floor flat"
+
+If the property type is **not mentioned**, respond with: **not mentioned**
+
+Respond with just the description — no markdown, JSON, or explanation.
 
 Report:
 \"\"\"
