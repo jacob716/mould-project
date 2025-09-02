@@ -1,0 +1,6 @@
+property_type,wall_type,age,issue_type,orientation,ventilation,window_type,occupancy,drying_clothes,main_issue_location,secondary_issue_locations,filename
+first floor flat,cavity wall,not mentioned,both,north,"uPVC windows with trickle vents, PIV unit installed",uPVC,not mentioned,yes,bedroom,hallway,David_Bly_SM2.pdf
+two-bedroom ground floor flat,cavity brick,pre-dating 1965,both,not mentioned,"mechanical extraction units in kitchen and bathroom, trickle vents, passive vents",not mentioned,1 adult and 2 children,not mentioned,Bedroom 1,Bedroom 2,David_Bly_PO6.pdf
+two-bedroomed first floor flat,cavity brick construction,not mentioned,mould,not mentioned,"mechanical extraction units in bathroom and kitchen, trickle vents fitted to windows",not mentioned,not mentioned,not mentioned,Bedroom 1,Bathroom,David_Bly_PO1.pdf
+terraced solid brick wall dwelling,solid wall,not mentioned,both,not mentioned,"forced extractors in kitchen and bathroom, trickle vents fitted to all windows",not mentioned,not mentioned,not mentioned,not mentioned,not mentioned,David_Bly_NW6.pdf
+one-bedroom first-floor flat,cavity brick construction,not mentioned,mould,not mentioned,mechanical extraction units in the bathroom and kitchen/lounge area,not mentioned,not mentioned,yes,bedroom,not mentioned,David_Bly_SO16.pdf

@@ -1,5 +1,7 @@
 from PyPDF2 import PdfReader
 import pdfplumber
+import re
+import unicodedata
 
 def extract_raw_text(pdf_path: str) -> str:
     """Extract raw text from PDF using pdfplumber."""
@@ -72,7 +74,10 @@ def extract_full_text(pdf_path: str) -> str:
         "Tel: 0344 846 0955 E: enquiries@cornerstone-ltd.co.uk W: www.cornerstone-ltd.co.uk",
         "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd.",
         "21A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire PO7 7SQ",
-        "20A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire, PO7 7SQ"
+        "20A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire, PO7 7SQ",
+        "Tel: 0844 846 0955 Fax: 0844 846 0956 E: enquiries@cornerstone-ltd.co.uk W: www.cornerstone-ltd.co.uk",
+        "Unit 52 Broadmarsh Business & Innovation Centre, Harts Farm Way, Havant, Hants, PO9 1HS",
+        "© Powered by Formworks"
     ]
 
     text_lines = full_text.splitlines()
@@ -80,55 +85,6 @@ def extract_full_text(pdf_path: str) -> str:
     cleaned_text = "\n".join(filtered_lines)
 
     return cleaned_text.strip()
-
-def extract_conclusion_section(pdf_path: str) -> str | None:
-    """
-    Extracts the 'Conclusion' section from a PDF file.
-
-    Args:
-        pdf_path: Path to the PDF file.
-
-    Returns:
-        The conclusion text as a string, or None if not found.
-    """
-    reader = PdfReader(pdf_path)
-    full_text = ""
-
-    for page in reader.pages:
-        text = page.extract_text()
-        if text:
-            full_text += text + "\n"
-
-
-
-    # Look for "Conclusion" section
-    if "3.0 Conclusion:" in full_text:
-        parts = full_text.split("3.0 Conclusion:", 1)
-        conclusion_block = parts[1]
-
-        # Cut off at 3.1 Recommendations if it exists
-        if "3.1 Recommendations" in conclusion_block:
-            conclusion_block = conclusion_block.split("3.1 Recommendations", 1)[0]
-
-        FOOTER_LINES = [
-        "Cornerstone Technical R eport",
-        "© Cornerstone Management Services Ltd 2009.",
-        "Reg Office: 24  Picton House Hussar Court Westside View Waterlooville  Hants PO 7 7SQ",
-        "Tel: 0 344 846 0955    E: enquiries@cornerstone -ltd.co.uk    W: www.cornerstone -ltd.co.uk",
-        "No part of this document is to be reproduced without the prior consent of Cornerstone Management Services Ltd.",
-        "20A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire, PO7 7SQ"
-        ]
-
-        # Remove any lines that exactly match known footer lines
-        conclusion_lines = conclusion_block.splitlines()
-        filtered_lines = [line for line in conclusion_lines if line.strip() not in FOOTER_LINES]
-        conclusion_block = "\n".join(filtered_lines)
-
-
-        return conclusion_block.strip()
-
-
-    return None
 
 def extract_atmospheric_conditions(pdf_path: str) -> str:
 
@@ -162,8 +118,6 @@ def extract_atmospheric_conditions(pdf_path: str) -> str:
 
     return cleaned_text[match.start():].strip()
 
-import re
-import unicodedata
 
 def extract_atmospheric_table(pdf_path: str) -> str:
     """
@@ -236,8 +190,6 @@ def extract_atmospheric_table(pdf_path: str) -> str:
     return "\n".join(table_lines).strip()
 
 
-import re
-
 def extract_relevant(pdf_path: str) -> str | None:
     """
     Extracts all text from section 1.0 Property through 3.0 Conclusion (inclusive),
@@ -270,3 +222,46 @@ def extract_relevant(pdf_path: str) -> str | None:
             relevant_lines.append(line)
 
     return "\n".join(relevant_lines).strip() if relevant_lines else None
+
+
+def extract_conclusion_section(pdf_path: str) -> str:
+    """
+    Extracts the 'Conclusion' section from a PDF file, handling both common formats:
+      1) "3.0 Conclusion" ... until "3.1 Recommendations" or "4.0 Moisture Survey"
+      2) A line "Conclusion" ... until a line "Recommendations"
+
+    Args:
+        pdf_path: Path to the PDF file.
+
+    Returns:
+        Extracted conclusion text, or the full text if no conclusion section detected.
+    """
+    full_text = extract_full_text(pdf_path)
+
+    # --- Format 1: "3.0 Conclusion"
+    match = re.search(r'(?mi)^3\.0\s*conclusion:?', full_text)
+    if match:
+        start_index = match.end()
+        conclusion_block = full_text[start_index:]
+
+        cutoff_pattern = r'(?mi)^(3\.1\s*recommendations|4\.0\s*moisture\s*survey)'
+        cutoff_match = re.search(cutoff_pattern, conclusion_block)
+        if cutoff_match:
+            conclusion_block = conclusion_block[:cutoff_match.start()]
+
+        return conclusion_block.strip()
+
+    # --- Format 2: "Conclusion" as a line
+    match = re.search(r'(?mi)^conclusion\s*$', full_text)
+    if match:
+        start_index = match.end()
+        conclusion_block = full_text[start_index:]
+
+        cutoff_match = re.search(r'(?mi)^recommendations\s*$', conclusion_block)
+        if cutoff_match:
+            conclusion_block = conclusion_block[:cutoff_match.start()]
+
+        return conclusion_block.strip()
+
+    # --- If nothing detected, return the full text
+    return full_text.strip()
