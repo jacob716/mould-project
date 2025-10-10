@@ -1,0 +1,26 @@
+property_type,wall_type,age,issue_type,orientation,ventilation,window_type,occupancy,drying_clothes,main_issue_location,secondary_issue_locations,filename
+ground floor flat in a modern purpose-built block,cavity,not mentioned,mould,east,continuous running fan units with boost function in bathroom and kitchen,not mentioned,not mentioned,yes,bedroom,bathroom,0989_TW6.pdf
+mid-terraced,solid,1885 – 1920,both,north-west,no mechanical extraction units and very few trickle vents,not mentioned,not mentioned,not mentioned,cloakroom,bedroom,0988_TW1.pdf
+end of terrace dwelling,solid,1835,damp,not mentioned,ceiling mounted extractor,not mentioned,not mentioned,not mentioned,basement corridor,"shower room, utility room",0993_W2.pdf
+three-bedroom semi-detached bungalow,timber,pre-1965,mould,not mentioned,passive ventilation with trickle vents,uPVC,not mentioned,not mentioned,Bedroom 1,Bedroom 3,0007_CM9.pdf
+two-bedroom ground floor flat,cavity,2020/2021,both,not mentioned,"forced extractor in kitchen/lounge and bathroom, limited trickle vents",not mentioned,2 adults and 1 infant,not mentioned,infants bedroom,lounge,0003_BR1.pdf
+mid-terrace dwelling,solid,early 1900s,both,not mentioned,"extractor fans in bathroom and kitchen, passive ventilation via timber box sash windows",timber box sash,not mentioned,not mentioned,bathroom,not mentioned,0995_W6.pdf
+one-bedroom ground floor flat,cavity,1984,both,not mentioned,"non-functioning extraction device in the bathroom, working unit in the kitchen",not mentioned,not mentioned,not mentioned,bathroom,kitchen,0010_CR0.pdf
+top floor flat in a purpose-built block,cavity,late 1960s,mould,not mentioned,"uPVC windows with trickle vents, bathroom fan unit",uPVC,not mentioned,not mentioned,Bedroom,Bathroom,0011_CR0.pdf
+first floor 2 bedroom property,cavity,not mentioned,not mentioned,north,"extractors, passive wall plates",not mentioned,not mentioned,not mentioned,"kitchen, bathroom","lounge, bedroom 2",0997_W6.pdf
+top floor flat in a purpose-built block,solid,not mentioned,both,north,"uPVC windows with trickle vents, non-working extractor fans",uPVC,not mentioned,yes,bedroom 1,bedroom 2,0006_CM9.pdf
+not mentioned,solid,not mentioned,damp,not mentioned,increasing ventilation may be prudent,not mentioned,not mentioned,not mentioned,treatment room,toilet,0992_W1B.pdf
+ground floor one-bedroom flat,cavity,not mentioned,damp,not mentioned,"forced extractors in the bathroom and kitchen, trickle vents",not mentioned,not mentioned,not mentioned,bathroom,hallway,0001_BN17.pdf
+ground floor flat in a purpose-built block,cavity,postdates 1965,both,not mentioned,"humidity controlled extractor in bathroom, trickle vents in windows",uPVC,not mentioned,not mentioned,bathroom,not mentioned,1000_WD7.pdf
+semi-detached three-bedroomed dwelling,cavity,2023,both,not mentioned,continuous running extractor with boost function,not mentioned,not mentioned,not mentioned,bathroom,front bedroom,0004_BS35.pdf
+two bedroom first floor flat,cavity,circa 1990s,mould,not mentioned,"working mechanical extraction units in the bathroom and WC, non-functioning unit in the kitchen",uPVC,not mentioned,not mentioned,"lounge, bedroom 2",bedroom 1,0002_BN43.pdf
+ground floor flat,cavity,not mentioned,both,not mentioned,"extractors, trickle vents, passive vents",not mentioned,not mentioned,yes,bathroom,bedroom,0009_CM9.pdf
+top two floors of a commercial property,solid,not mentioned,both,south,not mentioned,not mentioned,not mentioned,not mentioned,"Ladies Changing, Reception","Men’s Changing, Cold Gym",0998_W6.pdf
+top floor 3 bedroomed flat,solid,pre-dates 1875,damp,north,"extractor in bathroom, cooker hood in kitchen",sash windows,2 adults and 3 children,yes,bedroom 1,lounge,0999_WC1N.pdf
+first floor flat in a converted property,solid,late 1800s,mould,north/northwest,trickle vents and intermittent running fan in bathroom,aluminum frame double glazed,not mentioned,not mentioned,daughter’s bedroom,not mentioned,0990_TW8.pdf
+second floor apartment in a purpose built block,not mentioned,not mentioned,both,not mentioned,issues with forced ventilation to both the en-suite and bathroom areas,not mentioned,not mentioned,not mentioned,living area,en-suite,0991_TW9.pdf
+two bedroomed ground floor flat,cavity,not mentioned,both,not mentioned,"background trickle vents, forced extraction devices",not mentioned,not mentioned,yes,Bedroom 2,Bathroom,0012_CR8.pdf
+two-bedroom ground floor flat,cavity,not mentioned,both,not mentioned,kitchen and bathroom extractors,not mentioned,not mentioned,not mentioned,hallway,bedroom 2,0008_CM9.pdf
+ground floor 2 bedroom dwelling,cavity,not mentioned,mould,not mentioned,"forced extraction devices in bathroom and kitchen, passive wall plates in bedrooms",not mentioned,not mentioned,not mentioned,bedroom,not mentioned,0996_W6.pdf
+period mid-terrace London town house,solid,pre-dates 1865,both,not mentioned,extractor fan units in ensuite shower room and adjoining utility room,not mentioned,not mentioned,yes,"lower ground floor, top floor bedroom",not mentioned,0994_W2.pdf
+ground floor flat in a purpose-built block,cavity,not mentioned,both,not mentioned,"continuous running fans with boost functions, passive vents",uPVC,not mentioned,not mentioned,"bedroom, lounge",hallway,0005_CM3.pdf

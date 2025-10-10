@@ -1,9 +1,9 @@
 import pandas as pd
 
 # Paths
-MAIN_CSV = "extracted_reports_v2.csv"          # your main data
-CAUSES_CSV = "classified_causes_raw.csv"       # your cause classifications
-OUTPUT_CSV = "merged_reports.csv"              # merged output
+MAIN_CSV = "extracted_reports_batch2.csv"          # your main data
+CAUSES_CSV = "classified_causes_batch2.csv"       # your cause classifications
+OUTPUT_CSV = "merged_reports_batch2.csv"              # merged output
 
 # Load both CSVs
 df_main = pd.read_csv(MAIN_CSV)

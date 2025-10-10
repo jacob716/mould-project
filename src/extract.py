@@ -77,14 +77,39 @@ def extract_full_text(pdf_path: str) -> str:
         "20A Picton House, Hussar Court, Westside View, Waterlooville, Hampshire, PO7 7SQ",
         "Tel: 0844 846 0955 Fax: 0844 846 0956 E: enquiries@cornerstone-ltd.co.uk W: www.cornerstone-ltd.co.uk",
         "Unit 52 Broadmarsh Business & Innovation Centre, Harts Farm Way, Havant, Hants, PO9 1HS",
-        "© Powered by Formworks"
+        "© Powered by Formworks",
+        "© Cornerstone Management Services Ltd",
+        "Tel: 023 9200 9270 Fax: 023 9226 2557 E: enquiries@cornerstone-ltd.co.uk W: www.cornerstone-ltd.co.uk"
     ]
 
+    FOOTER_PATTERNS = [
+        r"Cornerstone",            # company name
+        r"©",                      # copyright
+        r"Tel[: ]",                # telephone
+        r"Fax[: ]",                # fax
+        r"E: ",                    # email
+        r"W: ",                    # website
+        r"Registered Office",
+        r"Reg Office",
+        r"\bLtd\b",                # company suffix
+        r"Form ID",                # "Form ID : 5460"
+        r"Page \d+ of \d+",        # "Page 7 of 13"
+        r"digitalfieldsolutions",  # specific site
+        r"http[s]?://",            # any URL
+    ]
+
+    def is_footer_line(line: str) -> bool:
+        if line.strip() in FOOTER_LINES:
+            return True
+        return any(re.search(p, line, re.IGNORECASE) for p in FOOTER_PATTERNS)
+
     text_lines = full_text.splitlines()
-    filtered_lines = [line for line in text_lines if line.strip() not in FOOTER_LINES]
+    filtered_lines = [line for line in text_lines if not is_footer_line(line)]
     cleaned_text = "\n".join(filtered_lines)
 
     return cleaned_text.strip()
+
+
 
 def extract_atmospheric_conditions(pdf_path: str) -> str:
 
@@ -226,42 +251,143 @@ def extract_relevant(pdf_path: str) -> str | None:
 
 def extract_conclusion_section(pdf_path: str) -> str:
     """
-    Extracts the 'Conclusion' section from a PDF file, handling both common formats:
-      1) "3.0 Conclusion" ... until "3.1 Recommendations" or "4.0 Moisture Survey"
-      2) A line "Conclusion" ... until a line "Recommendations"
-
-    Args:
-        pdf_path: Path to the PDF file.
-
-    Returns:
-        Extracted conclusion text, or the full text if no conclusion section detected.
+    Extracts the 'Conclusion' section from a PDF file.
+    - Handles numbered (e.g. '3.0 Conclusion' or '3.0 Conclusion:') and plain 'Conclusion' headings.
+    - Cuts off at the next section heading (numbered or known keyword, with or without a colon).
+    - If no conclusion found, returns an empty string.
     """
     full_text = extract_full_text(pdf_path)
 
-    # --- Format 1: "3.0 Conclusion"
-    match = re.search(r'(?mi)^3\.0\s*conclusion:?', full_text)
+    # --- Case 1: Numbered heading like '3.0 Conclusion' or '3.0 Conclusion:'
+    match = re.search(r'(?mi)^\d+\.\d+\s*conclusion:?\s*$', full_text)
     if match:
-        start_index = match.end()
-        conclusion_block = full_text[start_index:]
+        end_index = match.end()
+        conclusion_block = full_text[end_index:]
 
-        cutoff_pattern = r'(?mi)^(3\.1\s*recommendations|4\.0\s*moisture\s*survey)'
-        cutoff_match = re.search(cutoff_pattern, conclusion_block)
+        # Next numbered heading (with or without colon)
+        cutoff_match = re.search(r'(?mi)^\d+\.\d+\s+\w.*:?\s*$', conclusion_block)
         if cutoff_match:
-            conclusion_block = conclusion_block[:cutoff_match.start()]
+            return conclusion_block[:cutoff_match.start()].strip()
+        else:
+            return conclusion_block.strip()
 
-        return conclusion_block.strip()
-
-    # --- Format 2: "Conclusion" as a line
-    match = re.search(r'(?mi)^conclusion\s*$', full_text)
+    # --- Case 2: Plain 'Conclusion' (with or without colon)
+    match = re.search(r'(?mi)^conclusion:?\s*$', full_text)
     if match:
-        start_index = match.end()
-        conclusion_block = full_text[start_index:]
+        end_index = match.end()
+        conclusion_block = full_text[end_index:]
 
-        cutoff_match = re.search(r'(?mi)^recommendations\s*$', conclusion_block)
+        # Next keyword heading (with or without colon)
+        cutoff_match = re.search(
+            r'(?mi)^(recommendations|observations|ventilation|incident|property|moisture\s+survey|survey\s+equipment):?\s*$',
+            conclusion_block
+        )
         if cutoff_match:
-            conclusion_block = conclusion_block[:cutoff_match.start()]
+            return conclusion_block[:cutoff_match.start()].strip()
+        else:
+            return conclusion_block.strip()
 
-        return conclusion_block.strip()
-
-    # --- If nothing detected, return the full text
+    # --- No Conclusion found
     return full_text.strip()
+
+
+
+def extract_body_without_conclusion(pdf_path: str) -> str:
+    """
+    Extracts the full text of the PDF excluding the 'Conclusion' section,
+    and also chops off any trailing 'x.y Survey Equipment' section.
+    Handles headings with or without a colon.
+    """
+    full_text = extract_full_text(pdf_path)
+
+    # --- Case 1: Numbered heading like '3.0 Conclusion' or '3.0 Conclusion:'
+    match = re.search(r'(?mi)^\d+\.\d+\s*conclusion:?\s*$', full_text)
+    if match:
+        start_index = match.start()
+        end_index = match.end()
+        conclusion_block = full_text[end_index:]
+
+        # Next numbered heading (with or without colon)
+        cutoff_match = re.search(r'(?mi)^\d+\.\d+\s+\w.*:?\s*$', conclusion_block)
+        if cutoff_match:
+            body = (full_text[:start_index] + conclusion_block[cutoff_match.start():]).strip()
+        else:
+            body = full_text[:start_index].strip()
+
+    # --- Case 2: Plain 'Conclusion' (with or without colon)
+    else:
+        match = re.search(r'(?mi)^conclusion:?\s*$', full_text)
+        if match:
+            start_index = match.start()
+            end_index = match.end()
+            conclusion_block = full_text[end_index:]
+
+            # Next keyword heading (with or without colon)
+            cutoff_match = re.search(
+                r'(?mi)^(recommendations|observations|ventilation|incident|property|moisture\s+survey):?\s*$',
+                conclusion_block
+            )
+            if cutoff_match:
+                body = (full_text[:start_index] + conclusion_block[cutoff_match.start():]).strip()
+            else:
+                body = full_text[:start_index].strip()
+        else:
+            body = full_text.strip()
+
+    # --- Final cleanup: chop off trailing "Survey Equipment" (with or without colon)
+    survey_match = re.search(r'(?mi)^\d+\.\d+\s*survey\s+equipment:?\s*$', body)
+    if survey_match:
+        body = body[:survey_match.start()].strip()
+
+    return body
+
+
+import re
+
+def extract_body_without_conclusion_or_recommendations(pdf_path: str) -> str:
+    """
+    Extracts the full text of the PDF excluding:
+      - the 'Conclusion' section,
+      - the 'Recommendations' section,
+      - and any trailing 'x.y Survey Equipment' section.
+    Handles headings with or without a colon.
+    """
+    full_text = extract_full_text(pdf_path)
+    body = full_text
+
+    # --- Remove Conclusion section (numbered or plain)
+    conclusion_match = re.search(r'(?mi)^\d+\.\d+\s*conclusion:?\s*$|^conclusion:?\s*$', body)
+    if conclusion_match:
+        start_index = conclusion_match.start()
+        end_index = conclusion_match.end()
+        after_conclusion = body[end_index:]
+
+        # Find next numbered heading after Conclusion
+        cutoff_match = re.search(r'(?mi)^\d+\.\d+\s+\w.*:?\s*$', after_conclusion)
+        if cutoff_match:
+            next_start = end_index + cutoff_match.start()
+            body = body[:start_index] + body[next_start:]
+        else:
+            body = body[:start_index]
+
+    # --- Remove Recommendations section if present
+    recs_match = re.search(r'(?mi)^\d+\.\d+\s*recommendations:?\s*$', body)
+    if recs_match:
+        recs_start = recs_match.start()
+        recs_end = recs_match.end()
+        after_recs = body[recs_end:]
+
+        # Find next numbered heading after Recommendations
+        cutoff_match = re.search(r'(?mi)^\d+\.\d+\s+\w.*:?\s*$', after_recs)
+        if cutoff_match:
+            next_start = recs_end + cutoff_match.start()
+            body = body[:recs_start] + body[next_start:]
+        else:
+            body = body[:recs_start]
+
+    # --- Remove trailing Survey Equipment section
+    survey_match = re.search(r'(?mi)^\d+\.\d+\s*survey\s+equipment:?\s*$', body)
+    if survey_match:
+        body = body[:survey_match.start()].strip()
+
+    return body.strip()
