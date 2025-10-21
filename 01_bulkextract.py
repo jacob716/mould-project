@@ -38,7 +38,7 @@ from openai import OpenAI
 
 # ====== CONFIG ======
 PDF_FOLDER = "reports"  # Folder where your PDFs are stored
-OUTPUT_CSV = "test_extracted_reports.csv"
+OUTPUT_CSV = "extracted_reports.csv"
 MODEL = "gpt-4o-mini"  # Or "gpt-5-thinking" for extra reasoning
 # ====================
 

@@ -25,17 +25,17 @@ import pandas as pd
 from openai import OpenAI
 
 # ====== CONFIG ======
-CSV_FOLDER = "csv_files"  # use if you keep CSVs in a subfolder; otherwise set to "."
-INPUT_CSV  = os.path.join(CSV_FOLDER, "merged_reports_with_analysis_batch2.csv")
-OUTPUT_CSV = os.path.join(CSV_FOLDER, "merged_reports_categorised_batch2.csv")
-MODEL = "gpt-4o"  # full GPT-4o model
+CSV_FOLDER = "."  # use if you keep CSVs in a subfolder; otherwise set to "."
+INPUT_CSV  = os.path.join(CSV_FOLDER, "merged_columns.csv")
+OUTPUT_CSV = os.path.join(CSV_FOLDER, "final_table.csv")
+MODEL = "gpt-4o-mini"  # full GPT-4o model
 BATCH_LIMIT = None  # e.g. 50 for a test subset; None to process all
 # ====================
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 PROMPT_TEMPLATE = """
-You are a strict classifier for housing damp/mould survey data. Map the provided
+You are a strict classifier for housing damp and mould survey data. Map the provided
 texts into the exact categories below. If a field is unclear, pick the closest
 valid label (do NOT invent new labels).
 
@@ -64,15 +64,25 @@ window_type:
 cause_* and analysis_* (use the SAME taxonomy):
   ["poor ventilation", "residual construction moisture", "rising damp",
    "external moisture penetration", "internal leaks/plumbing",
-   "insufficient heating", "lifestyle factors", "other/unclear", "none"]
+   "insufficient heating", "occupant behaviour", "other/unclear", "none"]
 
-Rules & clarifications:
+Definitions for causes/analysis categories:
+- poor ventilation → condensation, high humidity, closed trickle vents, ineffective extract fans, lack of airflow.
+- residual construction moisture → leftover dampness from recent building or renovation work that has not yet dried out.
+- rising damp → ground moisture moving upward into walls/skirtings due to failed or missing damp proof course (low-level, up to ~1 m).
+- external moisture penetration → rain ingress, water through cracks, defective membranes or roofs letting moisture in from outside.
+- internal leaks/plumbing → leaks from pipes, plumbing, bathrooms, or internal water sources.
+- insufficient heating → lack of adequate heating leading to cold surfaces and condensation.
+- occupant behaviour → moisture or airflow issues related to occupant activity such as drying clothes indoors, placing furniture against walls, blocking vents, or general under-ventilation caused by how the property is used.
+- other/unclear → vague, mixed, or unspecified causes that do not clearly fit the above.
+
+Rules:
 - cause_primary/secondary refer to the CONCLUSION-derived CAUSE text.
 - analysis_primary/secondary refer to the BODY-derived ANALYSIS text.
 - If only one cause is evident, set *_secondary to "none".
 - Use "poor ventilation" for condensation due to airflow/extract issues.
 - "Forced ventilation" in wet rooms counts as "extract ventilation".
-- If mechanical + natural are both present, prefer the mechanical label.
+- If mechanical + natural ventilation are both present, prefer the mechanical label.
 - Only use "other/unclear" if it clearly doesn't match any category.
 
 Now classify:

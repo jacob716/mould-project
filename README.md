@@ -27,3 +27,5 @@ It extracts structured data from PDF survey reports and classifies the likely ca
 ```bash
 pip install -r requirements.txt
 export OPENAI_API_KEY="your_api_key"
+
+

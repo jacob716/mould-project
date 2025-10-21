@@ -6,8 +6,8 @@ from src.extract import extract_body_without_conclusion, extract_body_without_co
 import re
 
 # ====== CONFIG ======
-PDF_FOLDER = "reports/batch2"   # Folder with your PDFs
-OUTPUT_CSV = "analysis_without_conclusion_batch2_mini.csv"
+PDF_FOLDER = "reports"   # Folder with your PDFs
+OUTPUT_CSV = "analysis.csv"
 MODEL = "gpt-4o-mini"
 LIMIT = None   # set to None to process all files
 # ====================

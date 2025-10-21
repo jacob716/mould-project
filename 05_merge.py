@@ -6,11 +6,11 @@ Merges extracted data, causes, analysis, and heating system info into one comple
 import pandas as pd
 
 # ====== CONFIG ======
-EXTRACTED_CSV = "extracted_reports_batch2.csv"
-CAUSES_CSV = "classified_causes_batch2.csv"
-ANALYSIS_CSV = "analysis_without_conclusion_batch2_mini.csv"
-HEATING_CSV = "heating_systems_batch2.csv"  # new!
-OUTPUT_CSV = "merged_reports_with_analysis_batch2.csv"
+EXTRACTED_CSV = "extracted_reports.csv"
+CAUSES_CSV = "classified_causes.csv"
+ANALYSIS_CSV = "analysis.csv"
+HEATING_CSV = "heating_systems.csv"
+OUTPUT_CSV = "merged_columns.csv"
 # ====================
 
 # Load all dataframes

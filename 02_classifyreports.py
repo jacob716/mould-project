@@ -25,7 +25,7 @@ import re
 
 # ====== CONFIG ======
 PDF_FOLDER = "reports"  # Folder with your PDFs
-OUTPUT_CSV = "test_classified_causes.csv"
+OUTPUT_CSV = "classified_causes.csv"
 MODEL = "gpt-4o-mini"
 # ====================
 
@@ -34,25 +34,25 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Prompt template for cause extraction (free text)
 CAUSE_PROMPT = """
-You are a classifier for damp and mould survey reports.
-From the conclusion text below, extract the **primary cause** of the issue.
+You are analysing damp and mould survey reports.
+From the following report text, identify what you believe are the main cause(s) of the reported issues.
 
-Return your answer as valid JSON only, with exactly this format:
+Guidelines:
+- Write a clear explanation in a short paragraph (1–4 sentences).
+- Focus on the underlying causes, not just the symptoms (e.g. say "poor ventilation leading to condensation" instead of just "condensation").
+- If multiple factors are relevant, mention them all.
+- Keep the answer factual and concise. Do not include recommendations or suggested fixes.
+- Do not mention that you are an AI model.
+
+Return your answer as valid JSON only, with this format:
 
 {{
-  "cause": "concise summary of the main cause (max 10 words)"
+  "cause": "your explanation here"
 }}
 
-Keep the cause short and to the point, e.g.:
-- "condensation from inadequate ventilation"
-- "residual construction moisture"
-- "rain penetration through defective roof"
-- "furniture blocking airflow"
-
-Conclusion text:
+Report text:
 \"\"\"{report_text}\"\"\"
 """
-
 
 # ---------- Helpers ----------
 
